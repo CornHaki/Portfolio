@@ -411,7 +411,7 @@ const TerminalPreloader = ({ isLoaded, onComplete }) => {
   return (
     <div 
       className={`fixed inset-0 z-[200] bg-[#010102] flex items-center justify-center transition-all duration-[1200ms] ease-[cubic-bezier(0.16,1,0.3,1)] 
-      ${isLoaded ? 'opacity-0 pointer-events-none backdrop-blur-sm' : 'opacity-100 backdrop-blur-none'}`}
+      ${isLoaded ? 'opacity-0 pointer-events-none' : 'opacity-100'}`}
     >
       {/* Premium Glass Terminal Window */}
       <div 
@@ -494,10 +494,21 @@ const TerminalPreloader = ({ isLoaded, onComplete }) => {
 export default function App() {
   const [isMenuOpen, setIsMenuOpen] = useState(false);
   const [isLoaded, setIsLoaded] = useState(false);
+  const [isPreloaderMounted, setIsPreloaderMounted] = useState(true);
   const scrollY = useRef(0);
   const scrollProgressRef = useRef(null);
 
-  // Initialize Intersection Observer for GSAP-like reveals
+  // Initialize Intersection Observer for GSAP-like reveals and preloader unmount
+  useEffect(() => {
+    // Unmount preloader to free up resources and avoid ghosting bugs
+    if (isLoaded) {
+      const timer = setTimeout(() => {
+        setIsPreloaderMounted(false);
+      }, 1200);
+      return () => clearTimeout(timer);
+    }
+  }, [isLoaded]);
+
   useEffect(() => {
     const handleScroll = () => {
       scrollY.current = window.scrollY;
@@ -554,7 +565,9 @@ export default function App() {
     <div className="relative min-h-screen bg-[#030305] text-white font-sans overflow-x-hidden selection:bg-cyan-500/30">
       
       {/* INITIAL CINEMATIC TERMINAL LOADER */}
-      <TerminalPreloader isLoaded={isLoaded} onComplete={() => setIsLoaded(true)} />
+      {isPreloaderMounted && (
+        <TerminalPreloader isLoaded={isLoaded} onComplete={() => setIsLoaded(true)} />
+      )}
 
       {/* GLOBAL CSS FOR CINEMATIC EFFECTS */}
       <style>{`
@@ -626,18 +639,22 @@ export default function App() {
         <div ref={scrollProgressRef} className="h-full bg-gradient-to-r from-cyan-400 to-violet-500 origin-left scale-x-0 transition-transform duration-100 ease-out will-change-transform"></div>
       </div>
 
-      {/* Floating Ambient Orbs (Parallax Layer) */}
+      {/* Floating Ambient Orbs (Parallax Layer wrapped individually to avoid JS overwriting CSS float transform) */}
       <div className="fixed inset-0 z-[1] overflow-hidden pointer-events-none mix-blend-screen">
-        <div className="orb bg-cyan-800/40 w-[50vw] h-[50vw] top-[-20%] left-[-10%] parallax-layer" data-speed="0.05"></div>
-        <div className="orb bg-violet-900/20 w-[60vw] h-[60vw] bottom-[-30%] right-[-20%] parallax-layer" style={{animationDelay: '-5s'}} data-speed="-0.08"></div>
+        <div className="parallax-layer absolute inset-0 pointer-events-none" data-speed="0.05">
+          <div className="orb bg-cyan-800/40 w-[50vw] h-[50vw] top-[-20%] left-[-10%]"></div>
+        </div>
+        <div className="parallax-layer absolute inset-0 pointer-events-none" data-speed="-0.08">
+          <div className="orb bg-violet-900/20 w-[60vw] h-[60vw] bottom-[-30%] right-[-20%]" style={{animationDelay: '-5s'}}></div>
+        </div>
       </div>
 
       {/* --- NAVIGATION --- */}
       <nav className={`fixed top-6 w-full max-w-6xl left-1/2 -translate-x-1/2 px-6 z-[100] transition-all duration-1000 delay-500 ${isLoaded ? 'translate-y-0 opacity-100' : '-translate-y-10 opacity-0'}`}>
         <div className="glass-panel rounded-full px-6 py-4 flex items-center justify-between">
           <div className="text-xl font-bold tracking-tighter flex items-center gap-2 group cursor-pointer" onClick={() => scrollTo('home')}>
-            <div className="w-8 h-8 rounded-full bg-white text-black flex items-center justify-center text-sm font-black transition-transform duration-500 group-hover:rotate-180">D</div>
-            <span className="block text-sm sm:text-base">Dimpal<span className="text-cyan-400">.</span></span>
+            <div className="w-8 h-8 rounded-full bg-white text-black flex items-center justify-center text-sm font-black transition-transform duration-500 group-hover:rotate-180">D.</div>
+            <span className="hidden sm:block">Dimpal<span className="text-cyan-400">.</span></span>
           </div>
           
           <div className="hidden md:flex items-center gap-8 text-sm font-medium tracking-widest uppercase text-white/60">
@@ -924,7 +941,7 @@ export default function App() {
         </section>
 
         {/* --- CONTACT / END SCENE --- */}
-        <section id="contact" className="min-h-screen w-full flex items-center justify-center relative z-10 px-6 py-32">
+        <section id="contact" className="min-h-screen w-full flex items-center justify-center relative z-10 px-6 py-22 ">
           <div className="max-w-4xl w-full text-center">
             <div className="cine-reveal mb-12">
               <h2 className="text-6xl md:text-[8rem] font-black tracking-tighter leading-none glow-text">
