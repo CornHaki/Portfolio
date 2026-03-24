@@ -3,7 +3,7 @@ import {
   Github, Linkedin, Mail, Phone, MapPin, 
   ExternalLink, Download, Menu, X, Clock, 
   Terminal, Sparkles, ArrowRight, Briefcase, 
-  GraduationCap, Award, Database, Wrench, Layout,
+  GraduationCap, Cloud, Award, Database, Wrench, Layout,
   ChevronRight
 } from 'lucide-react';
 
@@ -49,10 +49,31 @@ const EDUCATION = [
 ];
 
 const SKILL_CATEGORIES = [
-  { title: 'Frontend', icon: <Layout size={20} />, skills: ['React.js', 'JavaScript (ES6+)', 'HTML5', 'CSS3', 'Tailwind'] },
-  { title: 'Backend & Data', icon: <Database size={20} />, skills: ['Node.js', 'Python', 'SQL'] },
-  { title: 'Core Languages', icon: <Terminal size={20} />, skills: ['C', 'C++'] },
-  { title: 'Concepts & Tools', icon: <Wrench size={20} />, skills: ['DSA', 'Git/GitHub', 'REST APIs'] }
+  { 
+    title: 'Frontend & Design', 
+    icon: <Layout size={20} />, 
+    skills: ['React.js', 'Next.js', 'TypeScript', 'Tailwind', 'Figma', 'Google Stitch'] 
+  },
+  { 
+    title: 'Backend & Data', 
+    icon: <Database size={20} />, 
+    skills: ['Node.js', 'Express.js', 'Python', 'PostgreSQL', 'MongoDB', 'SQL'] 
+  },
+  { 
+    title: 'Core Languages', 
+    icon: <Terminal size={20} />, 
+    skills: ['C', 'C++', 'Java', 'Go'] 
+  },
+  { 
+    title: 'Cloud & DevOps', 
+    icon: <Cloud size={20} />, 
+    skills: ['Docker', 'AWS', 'CI/CD', 'Linux'] 
+  },
+  { 
+    title: 'Development & Tools', 
+    icon: <Wrench size={20} />, 
+    skills: ['Git/GitHub', 'VS Code', 'Windsurf', 'Postman', 'REST APIs', 'Antigravity'] 
+  }
 ];
 
 const PROJECTS = [
@@ -70,7 +91,7 @@ const PROJECTS = [
     category: 'AI Engineering',
     desc: 'An intelligent memory layer solving LLM amnesia. Uses LangChain and local vector embeddings for blazing-fast, infinite context retrieval in 1,000+ turn conversations.',
     tech: ['Python', 'Streamlit', 'LangChain', 'Groq'],
-    link: '', // Set to empty if no live hosted demo exists yet
+    link: '', 
     github: 'https://github.com/CornHaki/NeuroHack',
     image: '/Neurahack.webp'
   },
@@ -102,55 +123,55 @@ const Canvas3DBackground = ({ scrollY }) => {
       canvas.width = window.innerWidth;
       canvas.height = window.innerHeight;
       particles = [];
-      for (let i = 0; i < 800; i++) {
-        // Premium color palette (Cyan, Violet, White stardust)
+      for (let i = 0; i < 600; i++) {
+        const isForeground = Math.random() > 0.8;
         const colors = [
-          `hsla(190, 100%, 70%, ${Math.random() * 0.8 + 0.2})`,
-          `hsla(260, 100%, 75%, ${Math.random() * 0.8 + 0.2})`,
-          `hsla(0, 0%, 100%, ${Math.random() * 0.5 + 0.1})`
+          `hsla(190, 100%, 75%, ${Math.random() * 0.5 + 0.1})`,
+          `hsla(260, 100%, 80%, ${Math.random() * 0.5 + 0.1})`,
+          `hsla(0, 0%, 100%, ${Math.random() * 0.3 + 0.05})`
         ];
         
         particles.push({
-          x: (Math.random() - 0.5) * 3000,
-          y: (Math.random() - 0.5) * 3000,
-          z: Math.random() * 2000,
-          size: Math.random() * 1.5 + 0.5,
-          color: colors[Math.floor(Math.random() * colors.length)]
+          x: (Math.random() - 0.5) * 3500,
+          y: (Math.random() - 0.5) * 3500,
+          z: Math.random() * 2500,
+          size: isForeground ? Math.random() * 3 + 1.5 : Math.random() * 1.5 + 0.2,
+          color: colors[Math.floor(Math.random() * colors.length)],
+          blur: isForeground ? Math.random() * 2 + 1 : 0 // Depth of field effect
         });
       }
     };
 
     const handleMouseMove = (e) => {
-      mouseRef.current.targetX = (e.clientX - canvas.width / 2) * 0.0005;
-      mouseRef.current.targetY = (e.clientY - canvas.height / 2) * 0.0005;
+      mouseRef.current.targetX = (e.clientX - canvas.width / 2) * 0.0003;
+      mouseRef.current.targetY = (e.clientY - canvas.height / 2) * 0.0003;
     };
 
     window.addEventListener('resize', init);
-    window.addEventListener('mousemove', handleMouseMove);
+    window.addEventListener('mousemove', handleMouseMove, { passive: true });
     init();
 
     const draw = () => {
-      // Premium motion blur effect
-      ctx.fillStyle = 'rgba(3, 3, 5, 0.25)';
+      // Cinematic motion blur
+      ctx.fillStyle = 'rgba(2, 2, 4, 0.3)';
       ctx.fillRect(0, 0, canvas.width, canvas.height);
       
-      // Smooth mouse interpolation
-      mouseRef.current.x += (mouseRef.current.targetX - mouseRef.current.x) * 0.05;
-      mouseRef.current.y += (mouseRef.current.targetY - mouseRef.current.y) * 0.05;
+      // Ultra-smooth mouse interpolation (lerping)
+      mouseRef.current.x += (mouseRef.current.targetX - mouseRef.current.x) * 0.03;
+      mouseRef.current.y += (mouseRef.current.targetY - mouseRef.current.y) * 0.03;
 
       const cx = canvas.width / 2;
       const cy = canvas.height / 2;
 
       particles.forEach(p => {
-        // Scroll pushes particles forward smoothly
-        p.z -= 1.5 + (scrollY.current * 0.003);
+        // Deep parallax scroll injection
+        p.z -= 0.8 + (scrollY.current * 0.001);
         if (p.z < 1) {
-          p.z = 2000;
-          p.x = (Math.random() - 0.5) * 3000;
-          p.y = (Math.random() - 0.5) * 3000;
+          p.z = 2500;
+          p.x = (Math.random() - 0.5) * 3500;
+          p.y = (Math.random() - 0.5) * 3500;
         }
 
-        // Apply mouse rotation (3D projection)
         const cosY = Math.cos(mouseRef.current.x);
         const sinY = Math.sin(mouseRef.current.x);
         const cosX = Math.cos(mouseRef.current.y);
@@ -161,7 +182,7 @@ const Canvas3DBackground = ({ scrollY }) => {
         let y1 = p.y * cosX - z1 * sinX;
         let z2 = z1 * cosX + p.y * sinX;
 
-        const fov = 400;
+        const fov = 600;
         const scale = fov / (fov + z2);
         const x2d = x1 * scale + cx;
         const y2d = y1 * scale + cy;
@@ -170,6 +191,12 @@ const Canvas3DBackground = ({ scrollY }) => {
           ctx.beginPath();
           ctx.arc(x2d, y2d, Math.max(0.1, p.size * scale), 0, Math.PI * 2);
           ctx.fillStyle = p.color;
+          if (p.blur > 0) {
+            ctx.shadowBlur = p.blur * scale * 5;
+            ctx.shadowColor = p.color;
+          } else {
+            ctx.shadowBlur = 0;
+          }
           ctx.fill();
         }
       });
@@ -186,7 +213,7 @@ const Canvas3DBackground = ({ scrollY }) => {
     };
   }, []);
 
-  return <canvas ref={canvasRef} className="fixed inset-0 z-0 pointer-events-none" />;
+  return <canvas ref={canvasRef} className="fixed inset-0 z-0 pointer-events-none opacity-80" />;
 };
 
 // 2. 3D Tilt Card Component (Isolated)
@@ -314,17 +341,164 @@ const TypewriterEffect = ({ words }) => {
   );
 };
 
+// 5. Cinematic Terminal Preloader (Premium Version)
+const TerminalPreloader = ({ isLoaded, onComplete }) => {
+  const [phase, setPhase] = useState(0); 
+  const [text, setText] = useState('');
+  const [progress, setProgress] = useState(0);
+  const [visibleLogs, setVisibleLogs] = useState([]);
+
+  const SYSTEM_LOGS = [
+    "resolving dependencies...",
+    "compiling physics engine [three.js]...",
+    "injecting quantum nodes...",
+    "synchronizing virtual DOM...",
+    "establishing secure connection...",
+    "bypassing mainframe security...",
+    "rendering interactive canvas...",
+    "sequence complete. launching..."
+  ];
+
+  useEffect(() => {
+    const cmd = "git init";
+    let i = 0;
+    
+    // Smooth typewriter
+    const typeNextChar = () => {
+      setText(cmd.substring(0, i + 1));
+      i++;
+      if (i < cmd.length) {
+        setTimeout(typeNextChar, Math.random() * 80 + 30);
+      } else {
+        setTimeout(() => setPhase(1), 500);
+      }
+    };
+    
+    const startTimeout = setTimeout(typeNextChar, 600);
+    return () => clearTimeout(startTimeout);
+  }, []);
+
+  useEffect(() => {
+    if (phase === 1) {
+      let p = 0;
+      const totalLogs = SYSTEM_LOGS.length;
+      
+      const loading = setInterval(() => {
+        // Logarithmic easing for progress bar
+        p += (100 - p) * 0.08 + 0.5; 
+        
+        if (p >= 100) {
+          p = 100;
+          clearInterval(loading);
+          setTimeout(() => setPhase(2), 200); // Highlight phase
+          setTimeout(() => onComplete(), 1000); // Trigger exit
+        }
+        
+        setProgress(Math.min(p, 100));
+
+        // Sync logs to progress percentage
+        const currentLogIndex = Math.min(
+          Math.floor((p / 100) * totalLogs), 
+          totalLogs - 1
+        );
+        setVisibleLogs(SYSTEM_LOGS.slice(0, currentLogIndex + 1));
+
+      }, 50);
+      return () => clearInterval(loading);
+    }
+  }, [phase, onComplete]);
+
+  return (
+    <div 
+      className={`fixed inset-0 z-[200] bg-[#010102] flex items-center justify-center transition-all duration-[1200ms] ease-[cubic-bezier(0.16,1,0.3,1)] 
+      ${isLoaded ? 'opacity-0 pointer-events-none backdrop-blur-sm' : 'opacity-100 backdrop-blur-none'}`}
+    >
+      {/* Premium Glass Terminal Window */}
+      <div 
+        className={`w-full max-w-2xl mx-4 rounded-xl bg-[#08080c]/90 border border-white/5 shadow-[0_20px_60px_rgba(0,0,0,0.8),0_0_0_1px_rgba(255,255,255,0.05)] backdrop-blur-2xl overflow-hidden font-mono transform transition-all duration-[1200ms] ease-[cubic-bezier(0.16,1,0.3,1)]
+        ${isLoaded ? 'scale-110 opacity-0 translate-y-8' : 'scale-100 opacity-100 translate-y-0'}
+        ${phase === 0 ? 'translate-y-4 opacity-0 animate-[slideUpFade_0.8s_ease-out_forwards]' : ''}`}
+      >
+        
+        {/* Terminal Header */}
+        <div className="flex items-center px-4 py-3 border-b border-white/5 bg-white/[0.02]">
+          <div className="flex gap-2.5">
+            <div className="w-3 h-3 rounded-full bg-[#ff5f56] shadow-[0_0_10px_rgba(255,95,86,0.5)]"></div>
+            <div className="w-3 h-3 rounded-full bg-[#ffbd2e] shadow-[0_0_10px_rgba(255,189,46,0.5)]"></div>
+            <div className="w-3 h-3 rounded-full bg-[#27c93f] shadow-[0_0_10px_rgba(39,201,63,0.5)]"></div>
+          </div>
+          <div className="flex-1 text-center text-[10px] text-white/30 tracking-widest font-semibold uppercase select-none">
+            sys_boot_sequence // v2.0
+          </div>
+        </div>
+
+        <div className="p-8 md:p-10">
+          {/* Typing Sequence */}
+          <div className="text-lg md:text-2xl mb-8 flex items-center text-white/90">
+            <span className="text-cyan-400 font-bold mr-3 shadow-cyan-400/50 drop-shadow-md">guest@dimpal:~$</span>
+            <span className="tracking-wide">{text}</span>
+            <span className="ml-[2px] w-[10px] h-[1.2em] bg-cyan-400 animate-blink inline-block align-middle shadow-[0_0_8px_#22d3ee]"></span>
+          </div>
+
+          {/* Progress Sequence */}
+          <div className={`transition-all duration-700 ease-[cubic-bezier(0.16,1,0.3,1)] transform ${phase >= 1 ? 'opacity-100 translate-y-0' : 'opacity-0 translate-y-4'}`}>
+            
+            <div className="flex justify-between text-xs md:text-sm text-cyan-400/60 mb-3 tracking-widest uppercase font-semibold">
+              <span className={phase === 2 ? 'text-cyan-300 transition-colors' : ''}>
+                {phase === 2 ? 'System Ready' : 'Initializing Architecture...'}
+              </span>
+              <span className={phase === 2 ? 'text-cyan-300' : ''}>{Math.floor(progress)}%</span>
+            </div>
+            
+            {/* Ultra-thin premium progress bar */}
+            <div className="w-full h-[2px] bg-white/5 relative rounded-full overflow-hidden">
+              <div 
+                className="absolute top-0 left-0 h-full bg-cyan-400 shadow-[0_0_12px_rgba(34,211,238,0.8)] transition-all duration-75 ease-out"
+                style={{ width: `${progress}%` }}
+              ></div>
+            </div>
+            
+            {/* Cinematic Logs */}
+            <div className="mt-8 text-[11px] md:text-xs text-white/40 space-y-2.5 h-[120px] overflow-hidden tracking-wider uppercase font-medium">
+              {visibleLogs.map((log, index) => (
+                <div 
+                  key={index} 
+                  className={`animate-[fadeInLeft_0.3s_ease-out_forwards] flex items-center gap-3
+                    ${index === visibleLogs.length - 1 && phase === 2 ? 'text-cyan-300 drop-shadow-[0_0_5px_rgba(34,211,238,0.5)]' : ''}
+                  `}
+                >
+                  <span className="text-cyan-500/50">&gt;</span> {log}
+                </div>
+              ))}
+            </div>
+          </div>
+        </div>
+
+      </div>
+
+      <style>{`
+        @keyframes slideUpFade {
+          0% { transform: translateY(20px); opacity: 0; }
+          100% { transform: translateY(0); opacity: 1; }
+        }
+        @keyframes fadeInLeft {
+          0% { transform: translateX(-10px); opacity: 0; }
+          100% { transform: translateX(0); opacity: 1; }
+        }
+      `}</style>
+    </div>
+  );
+};
+
+
 export default function App() {
   const [isMenuOpen, setIsMenuOpen] = useState(false);
   const [isLoaded, setIsLoaded] = useState(false);
   const scrollY = useRef(0);
   const scrollProgressRef = useRef(null);
 
-  // Initial Loader & Intersection Observer for GSAP-like reveals
+  // Initialize Intersection Observer for GSAP-like reveals
   useEffect(() => {
-    // Cinematic intro delay
-    setTimeout(() => setIsLoaded(true), 800);
-
     const handleScroll = () => {
       scrollY.current = window.scrollY;
       if (scrollProgressRef.current) {
@@ -379,14 +553,8 @@ export default function App() {
   return (
     <div className="relative min-h-screen bg-[#030305] text-white font-sans overflow-x-hidden selection:bg-cyan-500/30">
       
-      {/* INITIAL CINEMATIC LOADER */}
-      <div className={`fixed inset-0 z-[200] bg-[#030305] flex items-center justify-center transition-transform duration-1000 cubic-bezier-out ${isLoaded ? '-translate-y-full' : 'translate-y-0'}`}>
-        <div className="overflow-hidden">
-          <div className={`text-4xl font-bold tracking-widest text-cyan-400 transform transition-transform duration-1000 delay-300 ${isLoaded ? 'translate-y-full' : 'translate-y-0'}`}>
-            INITIALIZING
-          </div>
-        </div>
-      </div>
+      {/* INITIAL CINEMATIC TERMINAL LOADER */}
+      <TerminalPreloader isLoaded={isLoaded} onComplete={() => setIsLoaded(true)} />
 
       {/* GLOBAL CSS FOR CINEMATIC EFFECTS */}
       <style>{`
@@ -460,8 +628,8 @@ export default function App() {
 
       {/* Floating Ambient Orbs (Parallax Layer) */}
       <div className="fixed inset-0 z-[1] overflow-hidden pointer-events-none mix-blend-screen">
-        <div className="orb bg-cyan-600 w-[40vw] h-[40vw] top-[-10%] left-[-10%] parallax-layer" data-speed="0.1"></div>
-        <div className="orb bg-violet-600 w-[50vw] h-[50vw] bottom-[-20%] right-[-10%] parallax-layer" style={{animationDelay: '-5s'}} data-speed="-0.15"></div>
+        <div className="orb bg-cyan-800/40 w-[50vw] h-[50vw] top-[-20%] left-[-10%] parallax-layer" data-speed="0.05"></div>
+        <div className="orb bg-violet-900/20 w-[60vw] h-[60vw] bottom-[-30%] right-[-20%] parallax-layer" style={{animationDelay: '-5s'}} data-speed="-0.08"></div>
       </div>
 
       {/* --- NAVIGATION --- */}
@@ -516,7 +684,7 @@ export default function App() {
               <div className={`transform transition-all duration-1000 cubic-bezier-out delay-[800ms] ${isLoaded ? 'translate-y-0 opacity-100' : 'translate-y-[100%] opacity-0'}`}>
                 DIGITAL
               </div>
-              <div className={`text-transparent bg-clip-text bg-gradient-to-r from-cyan-400 via-violet-400 to-cyan-400 bg-[length:200%_auto] animate-[gradient_8s_linear_infinite] transform transition-all duration-1000 cubic-bezier-out delay-[900ms] ${isLoaded ? 'translate-y-0 opacity-100' : 'translate-y-[100%] opacity-0'}`}>
+              <div className={`text-transparent bg-clip-text bg-gradient-to-r from-cyan-300 via-violet-300 to-cyan-300 bg-[length:200%_auto] text-gradient animate-[gradient_8s_linear_infinite] transform transition-all duration-[1.5s] ease-[cubic-bezier(0.16,1,0.3,1)] delay-[1200ms] pb-4 ${isLoaded ? 'translate-y-0 opacity-100' : 'translate-y-[100%] opacity-0'}`}>
                 ARCHITECT
               </div>
             </h1>
@@ -579,15 +747,13 @@ export default function App() {
                           <h4 className="text-xl font-bold text-white mb-2">{edu.degree}</h4>
                           <p className="text-cyan-400 font-mono text-sm tracking-wider uppercase">{edu.school}</p>
 
-                          {/* --- ADD THIS SECTION BELOW --- */}
                           {edu.details && (
-                            <div className="inline-flex items-center gap-2 px-3 py-1 rounded-lg bg-white/5 border border-white/10">
+                            <div className="inline-flex items-center gap-2 px-3 py-1 rounded-lg bg-white/5 border border-white/10 mt-2">
                               <span className="w-1 h-1 rounded-full bg-violet-400"></span>
                               <span className="text-white/60 font-mono text-xs">{edu.details}</span>
                             </div>
                           )}
-                          {/* ------------------------------- */}
-                                    </div>
+                        </div>
                         <span className="text-white/40 font-mono text-sm whitespace-nowrap">{edu.period}</span>
                       </div>
                     </div>
