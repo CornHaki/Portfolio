@@ -654,7 +654,7 @@ export default function App() {
         <div className="glass-panel rounded-full px-6 py-4 flex items-center justify-between">
           <div className="text-xl font-bold tracking-tighter flex items-center gap-2 group cursor-pointer" onClick={() => scrollTo('home')}>
             <div className="w-8 h-8 rounded-full bg-white text-black flex items-center justify-center text-sm font-black transition-transform duration-500 group-hover:rotate-180">D.</div>
-            <span className="hidden sm:block">Dimpal<span className="text-cyan-400">.</span></span>
+            <span className="block text-sm sm:text-base">Dimpal<span className="text-cyan-400">.</span></span>
           </div>
           
           <div className="hidden md:flex items-center gap-8 text-sm font-medium tracking-widest uppercase text-white/60">
