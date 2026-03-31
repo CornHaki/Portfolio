@@ -93,21 +93,6 @@ const SERVICES = [
     title: 'Full-Stack Integration',
     desc: 'Connecting intuitive interfaces with powerful backends to deliver end-to-end, scalable digital solutions for businesses and startups.',
     icon: <Layers size={28} className="text-emerald-400 relative z-10" />
-  },
-  {
-    title: 'AI & LLM Integration',
-    desc: 'Enhancing web applications with intelligent features using OpenAI, Gemini, and custom APIs to build smart, context-aware tools and chatbots.',
-    icon: <Sparkles size={28} className="text-amber-400 relative z-10" />
-  },
-  {
-    title: 'Cloud & Deployment',
-    desc: 'Deploying and maintaining applications on modern cloud platforms like Vercel, Render, and AWS, ensuring reliable hosting and continuous delivery.',
-    icon: <Cloud size={28} className="text-sky-400 relative z-10" />
-  },
-  {
-    title: 'Custom API Development',
-    desc: 'Creating secure, well-documented RESTful endpoints and integrating third-party services like Stripe, Auth0, or custom machine learning models.',
-    icon: <Database size={28} className="text-rose-400 relative z-10" />
   }
 ];
 
@@ -796,12 +781,27 @@ export default function App() {
           </div>
         </div>
 
-        <div className={`absolute top-24 left-6 right-6 glass-panel rounded-3xl p-8 flex flex-col gap-6 transition-all duration-500 md:hidden origin-top ${isMenuOpen ? 'scale-y-100 opacity-100' : 'scale-y-0 opacity-0 pointer-events-none'}`}>
+        <div className={`absolute top-24 left-6 right-6 glass-panel rounded-3xl p-8 flex flex-col gap-6 transition-all duration-500 md:hidden origin-top ${isMenuOpen ? 'scale-y-100 opacity-100 pointer-events-auto' : 'scale-y-0 opacity-0 pointer-events-none'}`}>
           {['About', 'Experience', 'Services', 'Skills', 'Projects', 'Contact'].map((item) => (
             <button key={item} onClick={() => scrollTo(item.toLowerCase())} className="text-xl font-bold tracking-tight text-left hover:text-cyan-400 transition-colors active:scale-95 origin-left">
               {item}
             </button>
           ))}
+          
+          {/* Action Links duplicated in Mobile Nav Menu for easy access */}
+          <div className="flex flex-col gap-4 mt-2 pt-6 border-t border-white/10 relative z-[60] pointer-events-auto">
+            <button onClick={() => scrollTo('experience')} className="w-full py-4 rounded-full bg-white text-black text-sm font-bold tracking-widest uppercase hover:bg-cyan-50 transition-colors active:scale-95 flex items-center justify-center">
+              Enter Experience <ArrowRight size={16} className="ml-2" />
+            </button>
+            <div className="flex gap-4 justify-center">
+              <a href="https://github.com/CornHaki" target="_blank" rel="noreferrer" className="p-4 rounded-full glass-panel hover:bg-white/10 transition-all active:scale-95">
+                <Github size={20} />
+              </a>
+              <a href="https://www.linkedin.com/in/dimpal-baishya-a008a1249" target="_blank" rel="noreferrer" className="p-4 rounded-full glass-panel hover:bg-white/10 transition-all active:scale-95">
+                <Linkedin size={20} />
+              </a>
+            </div>
+          </div>
         </div>
       </nav>
 
@@ -843,6 +843,21 @@ export default function App() {
             <p className={`text-lg sm:text-xl md:text-2xl text-white/50 max-w-2xl mx-auto font-light leading-relaxed mb-16 transform transition-all duration-1000 cubic-bezier-out delay-[1000ms] ${isLoaded ? 'translate-y-0 opacity-100' : 'translate-y-10 opacity-0'}`}>
               I blend analytical physics principles with modern web technologies to forge <strong className="text-white font-medium hover:text-cyan-300 transition-colors cursor-default">high-performance, cinematic</strong> digital experiences.
             </p>
+            
+            {/* HERO BUTTONS: Hidden on Desktop, Visible on Mobile with Fixed z-index */}
+            <div className={`md:hidden relative z-[70] pointer-events-auto flex flex-col sm:flex-row items-center justify-center gap-6 transform transition-all duration-1000 cubic-bezier-out delay-[1100ms] ${isLoaded ? 'translate-y-0 opacity-100' : 'translate-y-10 opacity-0'}`}>
+              <MagneticButton onClick={() => scrollTo('experience')} className="group px-10 py-5 rounded-full bg-white text-black text-sm font-bold tracking-widest uppercase hover:bg-cyan-50 transition-colors shadow-[0_0_30px_rgba(255,255,255,0.15)] hover:shadow-[0_0_40px_rgba(255,255,255,0.3)] active:scale-95">
+                Enter Experience <ArrowRight size={16} className="inline-block ml-2 group-hover:translate-x-1 transition-transform" />
+              </MagneticButton>
+              <div className="flex gap-4">
+                <MagneticButton href="https://github.com/CornHaki" target="_blank" className="p-5 rounded-full glass-panel hover:bg-white/10 hover:border-white/20 transition-all group active:scale-95">
+                  <Github size={20} className="group-hover:scale-110 group-hover:text-cyan-300 transition-all" />
+                </MagneticButton>
+                <MagneticButton href="https://www.linkedin.com/in/dimpal-baishya-a008a1249" target="_blank" className="p-5 rounded-full glass-panel hover:bg-white/10 hover:border-white/20 transition-all group active:scale-95">
+                  <Linkedin size={20} className="group-hover:scale-110 group-hover:text-[#0077b5] transition-all" />
+                </MagneticButton>
+              </div>
+            </div>
             
           </div>
         </section>
@@ -1183,7 +1198,7 @@ export default function App() {
                     <span className="text-white tracking-tight">Dimpal<span className="text-cyan-400 group-hover:text-white transition-colors duration-300">.</span></span>
                  </div>
                  <p className="text-sm md:text-base font-light text-white/50 leading-relaxed tracking-wide max-w-sm group-hover:text-white/70 transition-colors duration-300">
-                   Engineering immersive realities and high-performance web architectures that push boundaries.
+                    Engineering immersive realities and high-performance web architectures that push boundaries.
                  </p>
               </div>
 
