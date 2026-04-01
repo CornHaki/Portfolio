@@ -1010,7 +1010,7 @@ export default function App() {
                         <div className="absolute inset-0 bg-gradient-to-t from-black/80 via-black/20 to-transparent z-10 opacity-60 group-hover:opacity-20 transition-opacity duration-700 pointer-events-none"></div>
                         <img 
                           src={project.image} 
-                          alt={project.title} 
+                          alt={`Screenshot of ${project.title} - ${project.category}`} 
                           className="w-full h-full object-cover transform scale-105 group-hover:scale-100 transition-transform duration-1000 cubic-bezier-out opacity-80 group-hover:opacity-100" 
                         />
                         <div className="absolute inset-0 z-20 flex items-center justify-center opacity-0 group-hover:opacity-100 transition-opacity duration-500">
@@ -1209,19 +1209,19 @@ export default function App() {
                     <div className="space-y-6">
                        <a href="mailto:baishyadimpal31@gmail.com" className="group flex items-center gap-4 text-white hover:text-cyan-400 transition-colors">
                           <div className="w-10 h-10 rounded-full bg-white/5 border border-white/10 flex items-center justify-center group-hover:scale-110 group-hover:bg-white/[0.08] group-hover:border-cyan-500/50 transition-all">
-                             <Mail size={16} />
+                              <Mail size={16} />
                           </div>
                           <span className="text-sm font-light tracking-wide hover-underline-animation">baishyadimpal31@gmail.com</span>
                        </a>
                        <a href="tel:+918473074892" className="group flex items-center gap-4 text-white hover:text-cyan-400 transition-colors">
                           <div className="w-10 h-10 rounded-full bg-white/5 border border-white/10 flex items-center justify-center group-hover:scale-110 group-hover:bg-white/[0.08] group-hover:border-cyan-500/50 transition-all">
-                             <Phone size={16} />
+                              <Phone size={16} />
                           </div>
                           <span className="text-sm font-light tracking-wide hover-underline-animation">+91 8473074892</span>
                        </a>
                        <div className="flex items-center gap-4 text-white/50 group cursor-default">
                           <div className="w-10 h-10 rounded-full bg-white/5 border border-white/10 flex items-center justify-center group-hover:border-white/30 transition-colors">
-                             <MapPin size={16} className="group-hover:text-white transition-colors"/>
+                              <MapPin size={16} className="group-hover:text-white transition-colors"/>
                           </div>
                           <span className="text-sm font-light tracking-wide group-hover:text-white transition-colors">Guwahati, India</span>
                        </div>
@@ -1233,13 +1233,13 @@ export default function App() {
                     <div className="flex flex-col gap-4">
                        <a href="https://github.com/CornHaki" target="_blank" rel="noopener noreferrer" className="group flex items-center gap-4 text-white/70 hover:text-white transition-colors">
                           <div className="w-10 h-10 rounded-full bg-white/5 border border-white/10 flex items-center justify-center group-hover:bg-white group-hover:text-black transition-all">
-                             <Github size={18} />
+                              <Github size={18} />
                           </div>
                           <span className="font-medium tracking-widest uppercase text-xs hover-underline-animation">GitHub</span>
                        </a>
                        <a href="https://www.linkedin.com/in/dimpal-baishya-a008a1249" target="_blank" rel="noopener noreferrer" className="group flex items-center gap-4 text-white/70 hover:text-white transition-colors">
                           <div className="w-10 h-10 rounded-full bg-white/5 border border-white/10 flex items-center justify-center group-hover:bg-[#0077b5] group-hover:border-[#0077b5] group-hover:text-white transition-all">
-                             <Linkedin size={18} />
+                              <Linkedin size={18} />
                           </div>
                           <span className="font-medium tracking-widest uppercase text-xs hover-underline-animation">LinkedIn</span>
                        </a>

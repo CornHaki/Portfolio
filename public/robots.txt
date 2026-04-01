@@ -1,0 +1,4 @@
+User-agent: *
+Allow: /
+
+Sitemap: https://dimpalbaishya.vercel.app/sitemap.xml
