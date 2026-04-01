@@ -187,6 +187,9 @@ const Canvas3DBackground = ({ scrollY }) => {
     init();
 
     const draw = () => {
+      ctx.shadowBlur = 0;
+      ctx.shadowColor = 'transparent';
+      
       ctx.fillStyle = 'rgba(2, 2, 4, 0.3)';
       ctx.fillRect(0, 0, canvas.width, canvas.height);
       
@@ -215,6 +218,10 @@ const Canvas3DBackground = ({ scrollY }) => {
         let z2 = z1 * cosX + p.y * sinX;
 
         const fov = 600;
+        
+        // 👇 THE FIX: Prevents particles from blowing up to infinity when passing the camera 👇
+        if (z2 < -fov + 50) return; 
+
         const scale = fov / (fov + z2);
         const x2d = x1 * scale + cx;
         const y2d = y1 * scale + cy;
