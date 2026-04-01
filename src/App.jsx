@@ -189,7 +189,7 @@ const Canvas3DBackground = ({ scrollY }) => {
     const draw = () => {
       ctx.shadowBlur = 0;
       ctx.shadowColor = 'transparent';
-      
+
       ctx.fillStyle = 'rgba(2, 2, 4, 0.3)';
       ctx.fillRect(0, 0, canvas.width, canvas.height);
       
@@ -820,7 +820,7 @@ export default function App() {
           <div className="max-w-5xl mx-auto text-center w-full transform-gpu parallax-layer hero-content" data-speed="0.4">
             
             <div className={`overflow-hidden mb-10 flex justify-center transition-all duration-1000 delay-700 ${isLoaded ? 'translate-y-0 opacity-100' : 'translate-y-10 opacity-0'}`}>
-              <div className="glass-panel inline-flex items-center gap-3 px-5 py-2.5 rounded-full border border-cyan-500/20 text-xs font-bold tracking-[0.2em] uppercase text-cyan-300 shadow-[0_0_15px_rgba(34,211,238,0.1)] hover:shadow-[0_0_25px_rgba(34,211,238,0.3)] transition-shadow duration-500 cursor-default">
+              <div className="glass-panel inline-flex items-center gap-3 px-5 py-2.5 rounded-full border border-cyan-500/20 text-xs font-bold tracking-[0.2em] uppercase text-cyan-300 shadow-[0_0_15px_rgba(34,211,238,0.1)]  transition-shadow duration-500 cursor-default">
                 <Sparkles size={14} className="animate-pulse" />
                 Engineering Immersive Realities
               </div>
@@ -830,7 +830,7 @@ export default function App() {
               <div className={`transform transition-all duration-1000 cubic-bezier-out delay-[800ms] group-hover:text-white/90 group-hover:drop-shadow-[0_0_8px_rgba(255,255,255,0.1)] ${isLoaded ? 'translate-y-0 opacity-100' : 'translate-y-[100%] opacity-0'}`}>
                 DIGITAL
               </div>
-              <div className={`text-transparent bg-clip-text bg-gradient-to-r from-cyan-200 via-violet-200 to-cyan-200 bg-[length:200%_auto] text-gradient animate-[gradient_8s_linear_infinite] transform transition-all duration-[1.5s] ease-[cubic-bezier(0.16,1,0.3,1)] delay-[1200ms] pb-4 group-hover:drop-shadow-[0_0_12px_rgba(34,211,238,0.2)] ${isLoaded ? 'translate-y-0 opacity-100' : 'translate-y-[100%] opacity-0'}`}>
+              <div className={`text-transparent bg-clip-text bg-gradient-to-r from-cyan-300 via-violet-400 to-cyan-400 bg-[length:200%_auto] text-gradient animate-[gradient_6s_linear_infinite] transform transition-all duration-[1.5s] ease-[cubic-bezier(0.16,1,0.3,1)] delay-[1200ms] pb-4 drop-shadow-[0_0_8px_rgba(34,211,238,0.2)] group-hover:drop-shadow-[0_0_15px_rgba(139,92,246,0.6)] ${isLoaded ? 'translate-y-0 opacity-100' : 'translate-y-[100%] opacity-0'}`}>
                 ARCHITECT
               </div>
             </h1>
