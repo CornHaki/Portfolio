@@ -75,6 +75,15 @@ const PROJECTS = [
     link: 'https://www.monomotorworks.com', 
     github: 'https://github.com/CornHaki/mono-motor-works',
     image: '/Mono.webp'
+  },
+  {
+    title: 'SubSync',
+    category: 'SaaS Engineering',
+    desc: 'A premium subscription management ecosystem designed to combat "subscription fatigue." Features an immersive Three.js particle background, real-time Firestore data persistence, and dynamic financial analytics via Recharts.',
+    tech: ['React', 'Firebase', 'Three.js', 'Framer Motion', 'Recharts'],
+    link: 'https://subscriptionsync.vercel.app/', // Add your deployment link here
+    github: 'https://github.com/CornHaki/subsync', // Add your repository link here
+    image: '/subsync.webp'
   }
 ];
 
