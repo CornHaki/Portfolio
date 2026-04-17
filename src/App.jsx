@@ -81,8 +81,8 @@ const PROJECTS = [
     category: 'SaaS Engineering',
     desc: 'A premium subscription management ecosystem designed to combat "subscription fatigue." Features an immersive Three.js particle background, real-time Firestore data persistence, and dynamic financial analytics via Recharts.',
     tech: ['React', 'Firebase', 'Three.js', 'Framer Motion', 'Recharts'],
-    link: 'https://subscriptionsync.vercel.app/', // Add your deployment link here
-    github: 'https://github.com/CornHaki/subsync', // Add your repository link here
+    link: 'https://subscriptionsync.vercel.app/',
+    github: 'https://github.com/CornHaki/subsync',
     image: '/subsync.webp'
   }
 ];
@@ -228,7 +228,7 @@ const Canvas3DBackground = ({ scrollY }) => {
 
         const fov = 600;
         
-        // 👇 THE FIX: Prevents particles from blowing up to infinity when passing the camera 👇
+        // Prevents particles from blowing up to infinity when passing the camera
         if (z2 < -fov + 50) return; 
 
         const scale = fov / (fov + z2);
@@ -530,9 +530,14 @@ export default function App() {
   const [isMenuOpen, setIsMenuOpen] = useState(false);
   const [isLoaded, setIsLoaded] = useState(false);
   const [isPreloaderMounted, setIsPreloaderMounted] = useState(true);
-  const [mousePosition, setMousePosition] = useState({ x: 0, y: 0 });
+  
+  // Performance optimizations: Replaced state with refs to prevent mass re-renders
   const scrollY = useRef(0);
   const scrollProgressRef = useRef(null);
+  const glowRef = useRef(null);
+  const parallaxLayersRef = useRef([]);
+  const projectRefs = useRef([]);
+  const ticking = useRef(false);
 
   useEffect(() => {
     if (isLoaded) {
@@ -544,33 +549,48 @@ export default function App() {
   }, [isLoaded]);
 
   useEffect(() => {
+    // Cache DOM nodes for performance on scroll
+    parallaxLayersRef.current = document.querySelectorAll('.parallax-layer');
+
     const handleScroll = () => {
       scrollY.current = window.scrollY;
-      if (scrollProgressRef.current) {
-        const totalScroll = document.documentElement.scrollTop;
-        const windowHeight = document.documentElement.scrollHeight - document.documentElement.clientHeight;
-        scrollProgressRef.current.style.transform = `scaleX(${totalScroll / windowHeight})`;
+      
+      // Debounce using requestAnimationFrame to kill mobile scroll lag
+      if (!ticking.current) {
+        window.requestAnimationFrame(() => {
+          if (scrollProgressRef.current) {
+            const maxScroll = document.documentElement.scrollHeight - window.innerHeight;
+            scrollProgressRef.current.style.transform = `scaleX(${scrollY.current / maxScroll})`;
+          }
+
+          parallaxLayersRef.current.forEach(layer => {
+            const speed = layer.getAttribute('data-speed');
+            layer.style.transform = `translate3d(0, ${scrollY.current * speed}px, 0)`;
+
+            if (layer.classList.contains('hero-content')) {
+              const opacity = Math.max(0, 1 - (scrollY.current / 450));
+              layer.style.opacity = opacity;
+              layer.style.pointerEvents = opacity < 0.1 ? 'none' : 'auto';
+            }
+          });
+
+          ticking.current = false;
+        });
+        ticking.current = true;
       }
-
-      document.querySelectorAll('.parallax-layer').forEach(layer => {
-        const speed = layer.getAttribute('data-speed');
-        layer.style.transform = `translate3d(0, ${window.scrollY * speed}px, 0)`;
-
-        if (layer.classList.contains('hero-content')) {
-          const opacity = Math.max(0, 1 - (window.scrollY / 450));
-          layer.style.opacity = opacity;
-          layer.style.pointerEvents = opacity < 0.1 ? 'none' : 'auto';
-        }
-      });
     };
 
     const updateMousePosition = (e) => {
-      setMousePosition({ x: e.clientX, y: e.clientY });
+      // Direct DOM manipulation completely eliminates React App re-renders on mousemove
+      if (glowRef.current) {
+        glowRef.current.style.background = `radial-gradient(600px at ${e.clientX}px ${e.clientY}px, rgba(34, 211, 238, 0.03), transparent 80%)`;
+      }
     };
 
     window.addEventListener('scroll', handleScroll, { passive: true });
     window.addEventListener('mousemove', updateMousePosition, { passive: true });
 
+    // Global Reveal Observer
     const observer = new IntersectionObserver((entries) => {
       entries.forEach((entry) => {
         if (entry.isIntersecting) {
@@ -581,10 +601,32 @@ export default function App() {
 
     document.querySelectorAll('.cine-reveal').forEach((el) => observer.observe(el));
 
+    // Focus Spy Observer specifically for Projects Archive (Middle 60% of Viewport)
+    const projectObserver = new IntersectionObserver((entries) => {
+      entries.forEach((entry) => {
+        if (entry.isIntersecting) {
+          entry.target.classList.remove('opacity-40', 'blur-[3px]', 'scale-[0.96]');
+          entry.target.classList.add('opacity-100', 'blur-0', 'scale-100');
+        } else {
+          entry.target.classList.remove('opacity-100', 'blur-0', 'scale-100');
+          entry.target.classList.add('opacity-40', 'blur-[3px]', 'scale-[0.96]');
+        }
+      });
+    }, {
+      threshold: 0,
+      rootMargin: '-20% 0px -20% 0px' // Applies focus state dynamically via CSS classes
+    });
+
+    // Attach observer manually to tracked refs
+    projectRefs.current.forEach((ref) => {
+      if (ref) projectObserver.observe(ref);
+    });
+
     return () => {
       window.removeEventListener('scroll', handleScroll);
       window.removeEventListener('mousemove', updateMousePosition);
       observer.disconnect();
+      projectObserver.disconnect();
     };
   }, []);
 
@@ -598,7 +640,6 @@ export default function App() {
     }
   };
 
-  // Helper function to map skills to lucide-react icons for the premium marquee
   const getSkillIcon = (skill) => {
     if(['React.js', 'Next.js', 'Tailwind CSS', 'Figma', 'Layout'].includes(skill)) return <Layout size={18} />;
     if(['Node.js', 'Express.js', 'Python', 'C++', 'Java'].includes(skill)) return <Code size={18} />;
@@ -607,7 +648,6 @@ export default function App() {
     return <Terminal size={18} />;
   };
 
-  // Render Infinite Marquee Skills - PREMIUM TECH UI UPGRADE
   const renderMarqueeSkills = (skillsArray) => {
     const infiniteArray = [...skillsArray, ...skillsArray, ...skillsArray, ...skillsArray];
     return infiniteArray.map((skill, idx) => (
@@ -630,11 +670,12 @@ export default function App() {
         <TerminalPreloader isLoaded={isLoaded} onComplete={() => setIsLoaded(true)} />
       )}
 
-      {/* Global Mouse Tracker Glow */}
+      {/* Global Mouse Tracker Glow - Optimized */}
       <div 
+        ref={glowRef}
         className="pointer-events-none fixed inset-0 z-50 transition-opacity duration-300 hidden md:block"
         style={{ 
-          background: `radial-gradient(600px at ${mousePosition.x}px ${mousePosition.y}px, rgba(34, 211, 238, 0.03), transparent 80%)` 
+          background: `radial-gradient(600px at 0px 0px, rgba(34, 211, 238, 0.0), transparent 80%)` 
         }} 
       />
 
@@ -696,13 +737,24 @@ export default function App() {
           text-shadow: 0 0 20px rgba(34, 211, 238, 0.4), 0 0 40px rgba(139, 92, 246, 0.4);
         }
 
+        .parallax-layer {
+          will-change: transform, opacity;
+        }
+
         .orb {
           position: absolute;
           border-radius: 50%;
-          filter: blur(100px);
+          filter: blur(60px); /* Lowered for mobile scroll performance */
           opacity: 0.5;
           pointer-events: none;
           animation: float 20s infinite alternate cubic-bezier(0.4, 0, 0.2, 1);
+          will-change: transform;
+          transform: translateZ(0); /* Hardware Acceleration trigger */
+        }
+        @media (min-width: 768px) {
+          .orb {
+            filter: blur(100px);
+          }
         }
         @keyframes float {
           0% { transform: translate(0, 0) scale(1); }
@@ -731,30 +783,14 @@ export default function App() {
           transform-origin: bottom left;
         }
         
-        /* Marquee CSS */
-        @keyframes marquee-ltr {
-          0% { transform: translateX(-50%); }
-          100% { transform: translateX(0); }
-        }
-        @keyframes marquee-rtl {
-          0% { transform: translateX(0); }
-          100% { transform: translateX(-50%); }
-        }
-        
-        .animate-marquee-ltr {
-          animation: marquee-ltr 40s linear infinite;
-        }
-        .animate-marquee-rtl {
-          animation: marquee-rtl 40s linear infinite;
-        }
-        
-        .pause-on-hover:hover {
-          animation-play-state: paused;
-        }
-
         .mask-edges {
           mask-image: linear-gradient(to right, transparent, black 15%, black 85%, transparent);
           -webkit-mask-image: linear-gradient(to right, transparent, black 15%, black 85%, transparent);
+        }
+
+        /* Custom Project Archive Focus wrapper class */
+        .project-focus-wrap {
+          will-change: opacity, transform, filter;
         }
       `}</style>
 
@@ -1017,68 +1053,74 @@ export default function App() {
             {PROJECTS.map((project, idx) => (
               <div 
                 key={idx} 
-                className={`flex flex-col lg:flex-row items-center justify-center gap-12 lg:gap-20 cine-reveal delay-100 ${idx % 2 !== 0 ? 'lg:flex-row-reverse' : ''} transition-all duration-[800ms] ease-out w-full`}
+                className={`cine-reveal delay-100 w-full`}
               >
-                <div className="w-full lg:w-[55%]">
-                  <TiltCard className="w-full">
-                    <a href={project.link || project.github} target="_blank" rel="noopener noreferrer" className="block w-full relative rounded-[1.5rem] overflow-hidden glass-panel border border-white/5 hover:border-cyan-500/40 transition-colors duration-500 group shadow-2xl shadow-black/60 cursor-pointer active:scale-[0.98]">
-                      <div className="relative aspect-[4/3] sm:aspect-[16/10] overflow-hidden bg-[#030305]">
-                        <div className="absolute inset-0 bg-gradient-to-t from-black/80 via-black/20 to-transparent z-10 opacity-60 group-hover:opacity-20 transition-opacity duration-700 pointer-events-none"></div>
-                        <img 
-                          src={project.image} 
-                          alt={`Screenshot of ${project.title} - ${project.category}`} 
-                          className="w-full h-full object-cover transform scale-105 group-hover:scale-100 transition-transform duration-1000 cubic-bezier-out opacity-80 group-hover:opacity-100" 
-                        />
-                        <div className="absolute inset-0 z-20 flex items-center justify-center opacity-0 group-hover:opacity-100 transition-opacity duration-500">
-                          <div className="w-16 h-16 rounded-full bg-black/60 backdrop-blur-md flex items-center justify-center border border-white/10 text-white shadow-[0_0_30px_rgba(0,0,0,0.5)] transform translate-y-4 group-hover:translate-y-0 transition-all duration-500">
-                            <ExternalLink size={24} />
+                {/* Dynamically controlled inner wrapper for scroll-spy focus effect */}
+                <div 
+                  ref={(el) => (projectRefs.current[idx] = el)}
+                  className={`project-focus-wrap flex flex-col lg:flex-row items-center justify-center gap-12 lg:gap-20 ${idx % 2 !== 0 ? 'lg:flex-row-reverse' : ''} transition-all duration-[800ms] ease-out w-full opacity-40 blur-[3px] scale-[0.96]`}
+                >
+                  <div className="w-full lg:w-[55%]">
+                    <TiltCard className="w-full">
+                      <a href={project.link || project.github} target="_blank" rel="noopener noreferrer" className="block w-full relative rounded-[1.5rem] overflow-hidden glass-panel border border-white/5 hover:border-cyan-500/40 transition-colors duration-500 group shadow-2xl shadow-black/60 cursor-pointer active:scale-[0.98]">
+                        <div className="relative aspect-[4/3] sm:aspect-[16/10] overflow-hidden bg-[#030305]">
+                          <div className="absolute inset-0 bg-gradient-to-t from-black/80 via-black/20 to-transparent z-10 opacity-60 group-hover:opacity-20 transition-opacity duration-700 pointer-events-none"></div>
+                          <img 
+                            src={project.image} 
+                            alt={`Screenshot of ${project.title} - ${project.category}`} 
+                            className="w-full h-full object-cover transform scale-105 group-hover:scale-100 transition-transform duration-1000 cubic-bezier-out opacity-80 group-hover:opacity-100" 
+                          />
+                          <div className="absolute inset-0 z-20 flex items-center justify-center opacity-0 group-hover:opacity-100 transition-opacity duration-500">
+                            <div className="w-16 h-16 rounded-full bg-black/60 backdrop-blur-md flex items-center justify-center border border-white/10 text-white shadow-[0_0_30px_rgba(0,0,0,0.5)] transform translate-y-4 group-hover:translate-y-0 transition-all duration-500">
+                              <ExternalLink size={24} />
+                            </div>
                           </div>
                         </div>
-                      </div>
-                    </a>
-                  </TiltCard>
-                </div>
+                      </a>
+                    </TiltCard>
+                  </div>
 
-                <div className="w-full lg:w-[45%] relative z-10 pt-8 lg:pt-0">
-                  <div className="absolute -top-10 -left-6 md:-top-20 md:-left-12 text-[8rem] md:text-[14rem] font-black text-white/[0.05] group-hover:text-white/[0.08] transition-colors duration-500 select-none pointer-events-none z-[-1] leading-none">
-                    0{idx + 1}
-                  </div>
-                  
-                  <span className="inline-flex items-center gap-2 px-3 py-1.5 rounded-md bg-white/5 backdrop-blur-md text-cyan-300 font-mono text-[10px] tracking-widest uppercase border border-white/10 mb-6 shadow-sm">
-                    <span className="w-1.5 h-1.5 rounded-full bg-cyan-400 animate-pulse shadow-[0_0_8px_#22d3ee]"></span>
-                    {project.category}
-                  </span>
-                  
-                  <h3 className="text-3xl md:text-4xl lg:text-5xl font-bold text-white tracking-tight mb-6 hover:text-cyan-400 transition-colors duration-300 cursor-default">
-                    {project.title}
-                  </h3>
-                  
-                  <p className="text-white/60 font-light leading-relaxed text-base md:text-lg mb-8 max-w-xl">
-                    {project.desc}
-                  </p>
-                  
-                  {/* Interactive Tech Pills */}
-                  <div className="flex flex-wrap gap-2 mb-10">
-                    {project.tech.map((t, i) => (
-                      <span key={i} className="px-3 py-1.5 text-[11px] font-mono tracking-wider text-cyan-100 bg-white/[0.03] border border-white/[0.05] rounded-md backdrop-blur-md shadow-sm hover:bg-white/[0.1] hover:border-cyan-400/50 hover:-translate-y-1 hover:shadow-[0_4px_15px_rgba(34,211,238,0.2)] hover:text-white transition-all duration-300 cursor-default">
-                        {t}
-                      </span>
-                    ))}
-                  </div>
-                  
-                  <div className="flex flex-wrap items-center gap-4">
+                  <div className="w-full lg:w-[45%] relative z-10 pt-8 lg:pt-0">
+                    <div className="absolute -top-10 -left-6 md:-top-20 md:-left-12 text-[8rem] md:text-[14rem] font-black text-white/[0.05] group-hover:text-white/[0.08] transition-colors duration-500 select-none pointer-events-none z-[-1] leading-none">
+                      0{idx + 1}
+                    </div>
                     
-                    {project.link && (
-                      <MagneticButton href={project.link} target="_blank" className="group flex items-center justify-center px-6 py-3 rounded-full bg-white text-black text-xs font-bold tracking-widest uppercase hover:bg-cyan-50 transition-all duration-300 shadow-[0_0_20px_rgba(255,255,255,0.1)] hover:shadow-[0_0_30px_rgba(255,255,255,0.25)] active:scale-95">
-                        View Live <ArrowRight size={14} className="ml-2 group-hover:translate-x-1 transition-transform" />
-                      </MagneticButton>
-                    )}
+                    <span className="inline-flex items-center gap-2 px-3 py-1.5 rounded-md bg-white/5 backdrop-blur-md text-cyan-300 font-mono text-[10px] tracking-widest uppercase border border-white/10 mb-6 shadow-sm">
+                      <span className="w-1.5 h-1.5 rounded-full bg-cyan-400 animate-pulse shadow-[0_0_8px_#22d3ee]"></span>
+                      {project.category}
+                    </span>
+                    
+                    <h3 className="text-3xl md:text-4xl lg:text-5xl font-bold text-white tracking-tight mb-6 hover:text-cyan-400 transition-colors duration-300 cursor-default">
+                      {project.title}
+                    </h3>
+                    
+                    <p className="text-white/60 font-light leading-relaxed text-base md:text-lg mb-8 max-w-xl">
+                      {project.desc}
+                    </p>
+                    
+                    {/* Interactive Tech Pills */}
+                    <div className="flex flex-wrap gap-2 mb-10">
+                      {project.tech.map((t, i) => (
+                        <span key={i} className="px-3 py-1.5 text-[11px] font-mono tracking-wider text-cyan-100 bg-white/[0.03] border border-white/[0.05] rounded-md backdrop-blur-md shadow-sm hover:bg-white/[0.1] hover:border-cyan-400/50 hover:-translate-y-1 hover:shadow-[0_4px_15px_rgba(34,211,238,0.2)] hover:text-white transition-all duration-300 cursor-default">
+                          {t}
+                        </span>
+                      ))}
+                    </div>
+                    
+                    <div className="flex flex-wrap items-center gap-4">
+                      
+                      {project.link && (
+                        <MagneticButton href={project.link} target="_blank" className="group flex items-center justify-center px-6 py-3 rounded-full bg-white text-black text-xs font-bold tracking-widest uppercase hover:bg-cyan-50 transition-all duration-300 shadow-[0_0_20px_rgba(255,255,255,0.1)] hover:shadow-[0_0_30px_rgba(255,255,255,0.25)] active:scale-95">
+                          View Live <ArrowRight size={14} className="ml-2 group-hover:translate-x-1 transition-transform" />
+                        </MagneticButton>
+                      )}
 
-                    {project.github && (
-                      <MagneticButton href={project.github} target="_blank" className="group flex items-center justify-center px-6 py-3 rounded-full border border-white/10 bg-white/[0.02] text-white text-xs font-bold tracking-widest uppercase hover:bg-white/10 hover:border-white/30 transition-all duration-300 backdrop-blur-md active:scale-95">
-                        <Github size={14} className="mr-2 group-hover:-translate-y-0.5 transition-transform" /> Source Code
-                      </MagneticButton>
-                    )}
+                      {project.github && (
+                        <MagneticButton href={project.github} target="_blank" className="group flex items-center justify-center px-6 py-3 rounded-full border border-white/10 bg-white/[0.02] text-white text-xs font-bold tracking-widest uppercase hover:bg-white/10 hover:border-white/30 transition-all duration-300 backdrop-blur-md active:scale-95">
+                          <Github size={14} className="mr-2 group-hover:-translate-y-0.5 transition-transform" /> Source Code
+                        </MagneticButton>
+                      )}
+                    </div>
                   </div>
                 </div>
               </div>
@@ -1094,44 +1136,57 @@ export default function App() {
           </div>
           
           <div className="grid grid-cols-1 md:grid-cols-2 gap-8">
-            {ARSENAL_SKILLS.map((set, idx) => (
-              <div key={idx} className={`cine-reveal delay-${(idx % 4) * 100}`}>
-                <TiltCard className="h-full">
-                  <div className="p-8 md:p-10 rounded-[2rem] bg-gradient-to-b from-white/[0.04] to-black/40 border border-white/[0.05] hover:border-white/10 transition-all duration-500 shadow-[0_8px_32px_0_rgba(0,0,0,0.3)] backdrop-blur-xl group/bento h-full flex flex-col relative overflow-hidden">
-                    
-                    {/* Indexing Indicator */}
-                    <div className="absolute top-6 right-6 md:top-8 md:right-8 text-5xl md:text-6xl font-black text-white/[0.04] group-hover/bento:text-white/[0.08] transition-colors duration-500 pointer-events-none select-none z-0">
-                      0{idx + 1}
-                    </div>
+            {ARSENAL_SKILLS.map((set, idx) => {
+              // Dynamic premium glow classes based on the category color
+              const dynamicGlow = {
+                'text-cyan-400': 'hover:border-cyan-500/40 hover:shadow-[0_0_40px_-10px_rgba(34,211,238,0.25)]',
+                'text-violet-400': 'hover:border-violet-500/40 hover:shadow-[0_0_40px_-10px_rgba(139,92,246,0.25)]',
+                'text-emerald-400': 'hover:border-emerald-500/40 hover:shadow-[0_0_40px_-10px_rgba(52,211,153,0.25)]',
+                'text-amber-400': 'hover:border-amber-500/40 hover:shadow-[0_0_40px_-10px_rgba(251,191,36,0.25)]',
+              }[set.color] || 'hover:border-white/30 hover:shadow-[0_0_40px_-10px_rgba(255,255,255,0.15)]';
 
-                    {/* Dynamic Ambient Glow matching the category color */}
-                    <div className={`absolute -top-24 -right-24 w-64 h-64 rounded-full blur-[80px] opacity-0 group-hover/bento:opacity-100 transition-opacity duration-700 ${set.bg} pointer-events-none`}></div>
-                    
-                    {/* Subtle top highlight line */}
-                    <div className="absolute top-0 left-0 w-full h-[1px] bg-gradient-to-r from-transparent via-white/20 to-transparent opacity-0 group-hover/bento:opacity-100 transition-opacity duration-700"></div>
-
-                    <div className="flex items-center gap-5 mb-10 relative z-10">
-                      <div className="w-14 h-14 rounded-2xl bg-[#030305] border border-white/10 flex items-center justify-center group-hover/bento:scale-110 transition-transform duration-500 shadow-[0_0_15px_rgba(0,0,0,0.5)]">
-                        <span className={`${set.color} group-hover/bento:drop-shadow-[0_0_8px_currentColor] transition-all duration-500`}>{set.icon}</span>
+              return (
+                <div key={idx} className={`cine-reveal delay-${(idx % 4) * 100}`}>
+                  <TiltCard className="h-full">
+                    <div className={`p-8 md:p-10 rounded-[2rem] bg-gradient-to-b from-white/[0.04] to-black/40 border border-white/[0.05] transition-all duration-500 shadow-[0_8px_32px_0_rgba(0,0,0,0.3)] backdrop-blur-xl group/bento h-full flex flex-col relative overflow-hidden ${dynamicGlow}`}>
+                      
+                      {/* Indexing Indicator */}
+                      <div className="absolute top-6 right-6 md:top-8 md:right-8 text-5xl md:text-6xl font-black text-white/[0.04] group-hover/bento:text-white/[0.08] transition-colors duration-500 pointer-events-none select-none z-0">
+                        0{idx + 1}
                       </div>
-                      <h3 className="text-2xl md:text-3xl font-bold text-white tracking-tight group-hover/bento:text-white/90 transition-colors">{set.category}</h3>
-                    </div>
 
-                    <div className="flex flex-wrap gap-3 relative z-10 mt-auto">
-                      {set.skills.map((skill, sIdx) => (
-                        <MagneticButton key={sIdx} className="px-5 py-2.5 rounded-xl bg-white/[0.02] border border-white/[0.05] hover:bg-white/[0.08] hover:border-white/20 text-white/70 hover:text-white text-sm font-medium tracking-wide transition-all duration-300 shadow-sm active:scale-95 cursor-default group/skill">
-                          <span className="relative z-10 flex items-center gap-2">
-                            <span className="w-1.5 h-1.5 rounded-full bg-white/20 group-hover/skill:bg-cyan-400 group-hover/skill:shadow-[0_0_8px_#22d3ee] transition-all duration-300"></span>
-                            {skill}
-                          </span>
-                        </MagneticButton>
-                      ))}
-                    </div>
+                      {/* Dynamic Ambient Glow matching the category color */}
+                      <div className={`absolute -top-24 -right-24 w-64 h-64 rounded-full blur-[80px] opacity-0 group-hover/bento:opacity-100 transition-opacity duration-700 ${set.bg} pointer-events-none`}></div>
+                      
+                      {/* Secondary subtle glow for a more balanced spread */}
+                      <div className={`absolute -bottom-24 -left-24 w-56 h-56 rounded-full blur-[80px] opacity-0 group-hover/bento:opacity-60 transition-opacity duration-700 delay-100 ${set.bg} pointer-events-none`}></div>
+                      
+                      {/* Subtle top highlight line */}
+                      <div className="absolute top-0 left-0 w-full h-[1px] bg-gradient-to-r from-transparent via-white/20 to-transparent opacity-0 group-hover/bento:opacity-100 transition-opacity duration-700"></div>
 
-                  </div>
-                </TiltCard>
-              </div>
-            ))}
+                      <div className="flex items-center gap-5 mb-10 relative z-10">
+                        <div className="w-14 h-14 rounded-2xl bg-[#030305] border border-white/10 flex items-center justify-center group-hover/bento:scale-110 transition-transform duration-500 shadow-[0_0_15px_rgba(0,0,0,0.5)]">
+                          <span className={`${set.color} group-hover/bento:drop-shadow-[0_0_8px_currentColor] transition-all duration-500`}>{set.icon}</span>
+                        </div>
+                        <h3 className="text-2xl md:text-3xl font-bold text-white tracking-tight group-hover/bento:text-white/90 transition-colors">{set.category}</h3>
+                      </div>
+
+                      <div className="flex flex-wrap gap-3 relative z-10 mt-auto">
+                        {set.skills.map((skill, sIdx) => (
+                          <MagneticButton key={sIdx} className="px-5 py-2.5 rounded-xl bg-white/[0.02] border border-white/[0.05] hover:bg-white/[0.08] hover:border-white/20 text-white/70 hover:text-white text-sm font-medium tracking-wide transition-all duration-300 shadow-sm active:scale-95 cursor-default group/skill">
+                            <span className="relative z-10 flex items-center gap-2">
+                              <span className="w-1.5 h-1.5 rounded-full bg-white/20 group-hover/skill:bg-cyan-400 group-hover/skill:shadow-[0_0_8px_#22d3ee] transition-all duration-300"></span>
+                              {skill}
+                            </span>
+                          </MagneticButton>
+                        ))}
+                      </div>
+
+                    </div>
+                  </TiltCard>
+                </div>
+              );
+            })}
           </div>
         </section>
 
